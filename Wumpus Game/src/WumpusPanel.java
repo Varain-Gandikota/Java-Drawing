@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 
 public class WumpusPanel extends JPanel implements KeyListener {
     public static final int PLAYING = 0;
@@ -14,7 +15,6 @@ public class WumpusPanel extends JPanel implements KeyListener {
     private int status;
     private WumpusPlayer player;
     private WumpusMap map;
-
     private BufferedImage floor;
     private BufferedImage arrow;
     private BufferedImage fog;
@@ -32,7 +32,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
     private BufferedImage buffer;
 
     private String message;
-
+    private ArrayList<WumpusSquare> alreadyVisited = new ArrayList<>();
 
     public WumpusPanel(){
         super();
@@ -73,6 +73,8 @@ public class WumpusPanel extends JPanel implements KeyListener {
         }while(!map.isBeatable());
         map.getGrid()[map.getLadderRow()][map.getLadderColumn()].setVisited(true);
         player = new WumpusPlayer();
+        alreadyVisited.clear();
+        alreadyVisited.add(map.getGrid()[map.getLadderRow()][map.getLadderColumn()]);
         player.setRowPosition(map.getLadderRow());
         player.setColPosition(map.getLadderColumn());
 
@@ -181,8 +183,10 @@ public class WumpusPanel extends JPanel implements KeyListener {
                     player.setRowPosition(player.getRowPosition()-1);
                     player.setDirection(WumpusPlayer.UP);
                     map.getGrid()[player.getRowPosition()][player.getColPosition()].setVisited(true);
+                    alreadyVisited.add(map.getGrid()[player.getRowPosition()][player.getColPosition()]);
                     repaint();
                 }
+
                 break;
             case 's':
                 if (status == WumpusPanel.PLAYING && player.getRowPosition()+1 < map.getGrid().length)
@@ -190,6 +194,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
                     player.setRowPosition(player.getRowPosition()+1);
                     player.setDirection(WumpusPlayer.DOWN);
                     map.getGrid()[player.getRowPosition()][player.getColPosition()].setVisited(true);
+                    alreadyVisited.add(map.getGrid()[player.getRowPosition()][player.getColPosition()]);
                     repaint();
                 }
                 break;
@@ -199,6 +204,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
                     player.setColPosition(player.getColPosition()-1);
                     player.setDirection(WumpusPlayer.LEFT);
                     map.getGrid()[player.getRowPosition()][player.getColPosition()].setVisited(true);
+                    alreadyVisited.add(map.getGrid()[player.getRowPosition()][player.getColPosition()]);
                     repaint();
                 }
                 break;
@@ -208,6 +214,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
                     player.setColPosition(player.getColPosition()+1);
                     player.setDirection(WumpusPlayer.RIGHT);
                     map.getGrid()[player.getRowPosition()][player.getColPosition()].setVisited(true);
+                    alreadyVisited.add(map.getGrid()[player.getRowPosition()][player.getColPosition()]);
                     repaint();
                 }
                 break;
@@ -281,6 +288,35 @@ public class WumpusPanel extends JPanel implements KeyListener {
                 player.setHasArrow(false);
                 repaint();
                 break;
+            case '*':
+
+                WumpusSquare[][] grid = map.getGrid();
+                boolean cheatActive = true;
+                for (int i = 0; i < grid.length; i++){
+                    for (int j = 0; j < grid[i].length; j++){
+                        cheatActive &= grid[i][j].isVisited();
+                    }
+                }
+                System.out.println(alreadyVisited);
+                if (!cheatActive){
+                    for (int i = 0; i < grid.length; i++){
+                        for (int j = 0; j < grid[i].length; j++){
+                            grid[i][j].setVisited(true);
+                        }
+                    }
+                    repaint();
+                }
+                else{
+                    for (int i = 0; i < grid.length; i++){
+                        for (int j = 0; j < grid[i].length; j++){
+                            if (!alreadyVisited.contains(grid[i][j]))
+                                grid[i][j].setVisited(false);
+
+                        }
+                    }
+                    repaint();
+                }
+                break;
 
         }
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isNormalSquare() && status == WumpusPanel.PLAYING)
@@ -290,10 +326,14 @@ public class WumpusPanel extends JPanel implements KeyListener {
         if ((map.getGrid()[player.getRowPosition()][player.getColPosition()].isStench() ||
                 (map.getGrid()[player.getRowPosition()][player.getColPosition()].isDeadWumpus()) && status == WumpusPanel.PLAYING))
             message = "You smell a putrid stench";
+        if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isStench() && map.getGrid()[player.getRowPosition()][player.getColPosition()].isBreeze()){
+            message = "you smell a stench and feel a breeze";
+        }
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isLadder() && status == WumpusPanel.PLAYING)
             message = "You bump into a ladder";
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isGold() && status == WumpusPanel.PLAYING)
             message = "You see a glimmer. Press [E] to pick it up";
+
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isWumpus() && status == WumpusPanel.PLAYING)
         {
             message = "You are eaten by the Wumpus.\nPress [R] to restart";
@@ -301,7 +341,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
         }
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isPit() && status == WumpusPanel.PLAYING)
         {
-            message = "You fell down a pit to your death. Press [R] to restart";
+            message = "You fell down a pit and died. [R] to restart";
             status = WumpusPanel.DEAD;
             repaint();
         }
