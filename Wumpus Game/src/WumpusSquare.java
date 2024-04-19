@@ -17,7 +17,9 @@ public class WumpusSquare {
         stench = false;
         visited = false;
     }
-
+    public boolean isNormalSquare(){
+        return !gold && !ladder && !pit && !breeze && !wumpus && !deadWumpus && !stench;
+    }
     public boolean isGold() {
         return gold;
     }
@@ -96,8 +98,9 @@ public class WumpusSquare {
             return "L";
         if (pit)
             return "P";
-        if (gold)
+        if (this.gold)
             return "G";
-        return "*";
+        else
+            return "*";
     }
 }
