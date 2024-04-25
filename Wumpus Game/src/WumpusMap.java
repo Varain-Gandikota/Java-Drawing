@@ -2,7 +2,7 @@ import java.awt.*;
 public class WumpusMap {
     public static final int NUM_ROWS = 10;
     public static final int NUM_COLUMNS = 10;
-    public static final int NUM_PITS = 10;
+    public static final int NUM_PITS = 98;
 
     private WumpusSquare[][] grid;
     private int ladderColumn;
@@ -26,11 +26,11 @@ public class WumpusMap {
 
 
         //generates pits
-        for (int count = 0; count < 10; count++){
+        for (int count = 0; count < NUM_PITS; count++){
             do {
                 row = generateRandomNumber(0, WumpusMap.NUM_ROWS-1);
                 col = generateRandomNumber(0, WumpusMap.NUM_COLUMNS-1);
-            }while (!grid[row][col].isNormalSquare());
+            }while (grid[row][col].isLadder() || grid[row][col].isPit() || grid[row][col].isWumpus());
             grid[row][col].setPit(true);
 
         }
