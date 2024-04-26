@@ -241,49 +241,76 @@ public class WumpusPanel extends JPanel implements KeyListener {
                 }
                 break;
             case 'i':
-                if (player.hasArrow() && player.getRowPosition()-1 >= 0 && map.getGrid()[player.getRowPosition()-1][player.getColPosition()].isWumpus()){
-                    map.getGrid()[player.getRowPosition()-1][player.getColPosition()].setWumpus(false);
-                    map.getGrid()[player.getRowPosition()-1][player.getColPosition()].setDeadWumpus(true);
-                    message = "You hear a scream";
-                    player.setHasArrow(false);
-                    repaint();
-                    return;
+                if (player.hasArrow() && player.getRowPosition()-1 >= 0 && status == WumpusPanel.PLAYING){
+                    for (int i = player.getRowPosition()-1; i >= 0; i--)
+                    {
+                        if (map.getGrid()[i][player.getColPosition()].isWumpus())
+                        {
+                            map.getGrid()[i][player.getColPosition()].setWumpus(false);
+                            map.getGrid()[i][player.getColPosition()].setDeadWumpus(true);
+                            message = "You hear a scream";
+                            player.setHasArrow(false);
+                            repaint();
+                            return;
+                        }
+                    }
+
                 }
                 player.setHasArrow(false);
                 repaint();
                 break;
             case 'k':
-                if (player.hasArrow() && player.getRowPosition()+1 < map.getGrid().length && map.getGrid()[player.getRowPosition()+1][player.getColPosition()].isWumpus()){
-                    map.getGrid()[player.getRowPosition()+1][player.getColPosition()].setWumpus(false);
-                    map.getGrid()[player.getRowPosition()+1][player.getColPosition()].setDeadWumpus(true);
-                    message = "You hear a scream";
-                    player.setHasArrow(false);
-                    repaint();
-                    return;
+                if (player.hasArrow() && player.getRowPosition()+1 < map.getGrid().length && status == WumpusPanel.PLAYING){
+                    for (int i = player.getRowPosition()+1; i < map.getGrid().length; i++)
+                    {
+                        if (map.getGrid()[i][player.getColPosition()].isWumpus())
+                        {
+                            map.getGrid()[i][player.getColPosition()].setWumpus(false);
+                            map.getGrid()[i][player.getColPosition()].setDeadWumpus(true);
+                            message = "You hear a scream";
+                            player.setHasArrow(false);
+                            repaint();
+                            return;
+                        }
+                    }
+
                 }
                 player.setHasArrow(false);
                 repaint();
                 break;
             case 'j':
-                if (player.hasArrow() && player.getColPosition()-1 >= 0 && map.getGrid()[player.getRowPosition()][player.getColPosition()-1].isWumpus()){
-                    map.getGrid()[player.getRowPosition()][player.getColPosition()-1].setWumpus(false);
-                    map.getGrid()[player.getRowPosition()][player.getColPosition()-1].setDeadWumpus(true);
-                    message = "You hear a scream";
-                    player.setHasArrow(false);
-                    repaint();
-                    return;
+                if (player.hasArrow() && player.getColPosition()-1 >= 0 && status == WumpusPanel.PLAYING){
+                    for (int i = player.getColPosition()-1; i >= 0; i--)
+                    {
+                        if (map.getGrid()[player.getRowPosition()][i].isWumpus()){
+
+                            map.getGrid()[player.getRowPosition()][i].setWumpus(false);
+                            map.getGrid()[player.getRowPosition()][i].setDeadWumpus(true);
+                            message = "You hear a scream";
+                            player.setHasArrow(false);
+                            repaint();
+                            return;
+                        }
+                    }
+
+
                 }
                 player.setHasArrow(false);
                 repaint();
                 break;
             case 'l':
-                if (player.hasArrow() && player.getColPosition()+1 < map.getGrid()[0].length && map.getGrid()[player.getRowPosition()][player.getColPosition()+1].isWumpus()){
-                    map.getGrid()[player.getRowPosition()][player.getColPosition()+1].setWumpus(false);
-                    map.getGrid()[player.getRowPosition()][player.getColPosition()+1].setDeadWumpus(true);
-                    message = "You hear a scream";
-                    player.setHasArrow(false);
-                    repaint();
-                    return;
+                if (player.hasArrow() && player.getColPosition()+1 < map.getGrid()[0].length && status == WumpusPanel.PLAYING){
+                    for (int i = player.getColPosition()+1; i < map.getGrid()[0].length; i++)
+                    {
+                        if (map.getGrid()[player.getRowPosition()][i].isWumpus()){
+                            map.getGrid()[player.getRowPosition()][i].setWumpus(false);
+                            map.getGrid()[player.getRowPosition()][i].setDeadWumpus(true);
+                            message = "You hear a scream";
+                            player.setHasArrow(false);
+                            repaint();
+                            return;
+                        }
+                    }
                 }
                 player.setHasArrow(false);
                 repaint();
@@ -336,7 +363,7 @@ public class WumpusPanel extends JPanel implements KeyListener {
 
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isWumpus() && status == WumpusPanel.PLAYING)
         {
-            message = "You are eaten by the Wumpus.\nPress [R] to restart";
+            message = "You are eaten by the Wumpus. [R] to restart";
             status = WumpusPanel.DEAD;
         }
         if (map.getGrid()[player.getRowPosition()][player.getColPosition()].isPit() && status == WumpusPanel.PLAYING)
